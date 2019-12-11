@@ -14,7 +14,6 @@ class TransferWiseApi:
     """ Class that determines the API Actions """
 
     def __init__(self, token):
-        self.c = 5  # times to retry connecting.
         self.TOKEN = token
 
     def connect_to_api(
@@ -24,10 +23,8 @@ class TransferWiseApi:
             with Session() as session:
                 if _get:
                     try:
-                        response = session.get(
-                            URL + ENDPOINT, headers=HEADER, verify=False
-                        )
-                        log.info(
+                        response = session.get(f"{URL}{ENDPOINT}", headers=HEADER)
+                        log.debug(
                             f"\n\n\tSTATUS CODE:  {response.status_code}\n\nRESPONSE  ::  {response.text}"
                         )
                         if response.status_code == 200:
@@ -36,16 +33,13 @@ class TransferWiseApi:
                             res = response.text
                         return response.status_code, res
                     except Exception as e:
-                        log.info("API GET / Parse Error:  {}".format(e))
+                        log.debug("API GET / Parse Error:  {}".format(e))
                         return e
 
                 if _post:
                     try:
                         response = post(
-                            URL + ENDPOINT,
-                            headers=HEADER,
-                            json=payload,
-                            verify=False,  # not SSL yet --  Unverified HTTPS
+                            f"{URL}{ENDPOINT}", headers=HEADER, json=payload
                         )
                         if response.status_code in [200, 201, 409, 404]:
                             res = response.json()
@@ -59,10 +53,8 @@ class TransferWiseApi:
 
                 if _put:
                     try:
-                        response = session.put(
-                            URL + ENDPOINT, headers=HEADER, verify=False
-                        )
-                        log.info(
+                        response = session.put(f"{URL}{ENDPOINT}", headers=HEADER)
+                        log.debug(
                             f"\n\n\tSTATUS CODE:  {response.status_code}\n\nRESPONSE  ::  {response.text}"
                         )
                         if response.status_code == 200:
@@ -71,7 +63,7 @@ class TransferWiseApi:
                             res = response.text
                         return response.status_code, res
                     except Exception as e:
-                        log.info("API GET / Parse Error:  {}".format(e))
+                        log.debug("API GET / Parse Error:  {}".format(e))
                         return e
 
         except Exception as e:

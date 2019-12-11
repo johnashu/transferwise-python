@@ -1,8 +1,6 @@
 from transferwise_api import TransferWiseApi
 from config import *
 
-tw = TransferWiseApi(TOKEN)
-
 
 def pprint_res(lst):
     for x in lst:
@@ -15,8 +13,12 @@ def pprint_res(lst):
         print()
 
 
+tw = TransferWiseApi(TOKEN)
+
 code, profile = tw.connect_to_api(None, _get=True, URL=BASE_URL, ENDPOINT=PROFILE)
+
 LIST_RECIPIENTS = LIST_RECIPIENTS.format(profileId, "EUR")
+
 code, recipients_list = tw.connect_to_api(
     None, _get=True, URL=BASE_URL, ENDPOINT=LIST_RECIPIENTS
 )
