@@ -2,18 +2,13 @@ import time
 from requests import get, post, put, Session, options, packages
 import logging as log
 
-# suppress warnings..
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-packages.urllib3.disable_warnings(InsecureRequestWarning)
-
+    
 
 class TransferWiseApi:
     """ Class that determines the API Actions """
 
-    def __init__(self, token, header):
-        self.TOKEN = token
-        self.HEADER = header
+    TOKEN = TOKEN
+    HEADER = HEADER
 
     def connect_to_api(
         self, payload, _get=False, _post=False, _put=False, URL=None, ENDPOINT=None

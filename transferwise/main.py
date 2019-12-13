@@ -14,9 +14,6 @@ lines = "-" * 200
 
 class TransferWise(TransferWiseApi):
 
-    TOKEN = TOKEN
-    HEADER = HEADER
-
     def __init__(self, **kw):
         for k, v in kw.items():
             exec(f'self.{k} = kw["{k}"]')
