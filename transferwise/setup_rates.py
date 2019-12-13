@@ -1,23 +1,26 @@
+data = {
 # Currency exchange types
-FROM = "GBP"
-TO = "EUR"
+'FROM' : "GBP",
+'TO' : "EUR",
 
 # Amount to create a quote for.
 # we need a Target amount to send to the API but it is not required.
-SOURCE_AMOUNT = 1500
-TARGET_AMOUNT = None
+'SOURCE_AMOUNT' : 125,
+'TARGET_AMOUNT' : None,
 
 # Fee for Transferwise.. Take this off the source amount..  Used to display info only.
-FEE = 5.79
+'FEE' : 5.79,
 
 # Highest rateyou currently have / want to wait for more.
-HIGHEST_RATE = 1.18857
+'HIGHEST_RATE' : 1.19489,
 
 # Bank / Transferwise Statement Reference
-REFERENCE = "Bills-Programmatically"
+'REFERENCE' : "Bills-Programmatically",
 
 # Existing Transfer Id to delete if a higher rate is found..
-HIGHEST_TRANSFER_ID = False
+'HIGHEST_TRANSFER_ID' : False,
 
 # Delay in seconds between checking the rates.
-DELAY = 5
+'DELAY' : 5,
+
+}
