@@ -2,10 +2,6 @@ import time
 from requests import get, post, put, Session, options, packages
 import logging as log
 
-# suppress warnings..
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class TransferWiseApi:
     """ Class that determines the API Actions """
