@@ -13,7 +13,6 @@ lines = "-" * 200
 
 
 class TransferWise(TransferWiseApi):
-
     def __init__(self, **kw):
         for k, v in kw.items():
             exec(f'self.{k} = kw["{k}"]')
@@ -27,7 +26,7 @@ class TransferWise(TransferWiseApi):
         log.info(f"\nPolling Started...   Checking Every {self.DELAY} seconds\n")
         if self.HIGHEST_RATE:
             log.info(
-                f"""\t**START** self.HIGHEST_RATE  ::  {self.HIGHEST_RATE}\n\tAmount in {self.FROM}  ::  {self.SOURCE_AMOUNT} \n\tConversion to {self.TO}  ::  {self.HIGHEST_RATE*(self.SOURCE_AMOUNT-self.FEE):0.5f}\n\tself.FEE  =  {self.FEE}"""
+                f"""\t**START** self.HIGHEST_RATE  ::  {self.HIGHEST_RATE}\n\tAmount in {self.FROM}  ::  {self.SOURCE_AMOUNT} \n\tConversion to {self.TO}  ::  {self.HIGHEST_RATE*self.SOURCE_AMOUNT:0.5f}\n\tself.FEE  =  {self.FEE}"""
             )
 
     def display_rate_info(self, rate):

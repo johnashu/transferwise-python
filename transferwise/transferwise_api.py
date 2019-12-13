@@ -1,8 +1,8 @@
 import time
 from requests import get, post, put, Session, options, packages
 import logging as log
+from config import TOKEN, HEADER
 
-    
 
 class TransferWiseApi:
     """ Class that determines the API Actions """
