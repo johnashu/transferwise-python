@@ -7,6 +7,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+
 class TransferWiseApi:
     """ Class that determines the API Actions """
 

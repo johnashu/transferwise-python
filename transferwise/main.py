@@ -7,10 +7,15 @@ from config import *
 from setup_rates import data
 from logga import _logger
 
-log = _logger('info')
+log = _logger("info")
 
 lines = "-" * 200
-class TransferWise:
+
+
+class TransferWise(TransferWiseApi):
+
+    TOKEN = TOKEN
+    HEADER = HEADER
 
     def __init__(self, **kw):
         for k, v in kw.items():
@@ -19,8 +24,7 @@ class TransferWise:
         self.t = {"targetAmount": self.TARGET_AMOUNT}
         self.s = {"sourceAmount": self.SOURCE_AMOUNT}
 
-        self._RATES = RATES.format(self.FROM, self.TO)       
-      
+        self._RATES = RATES.format(self.FROM, self.TO)
 
     def display_start_message(self):
         log.info(f"\nPolling Started...   Checking Every {self.DELAY} seconds\n")
@@ -29,29 +33,33 @@ class TransferWise:
                 f"""\t**START** self.HIGHEST_RATE  ::  {self.HIGHEST_RATE}\n\tAmount in {self.FROM}  ::  {self.SOURCE_AMOUNT} \n\tConversion to {self.TO}  ::  {self.HIGHEST_RATE*(self.SOURCE_AMOUNT-self.FEE):0.5f}\n\tself.FEE  =  {self.FEE}"""
             )
 
-
     def display_rate_info(self, rate):
-        log.debug(f"""
+        log.debug(
+            f"""
     \tNew Rate  ::      {rate}
     \tHighest Rate  ::  {self.HIGHEST_RATE}
-    """)
+    """
+        )
 
         log.info(lines)
 
-        log.info(f"""
+        log.info(
+            f"""
     \tNEW HIGH RATE!!! BUY BUY BUY!! ... :: {rate}
     \tAmount {self.SOURCE_AMOUNT} in {self.FROM}  ::  Conversion to {self.TO} = {rate*(self.SOURCE_AMOUNT-self.FEE):0.5f}
     \tYou have gained {self.TO}  ::  {(rate*(self.SOURCE_AMOUNT-self.FEE))-(self.HIGHEST_RATE*(self.SOURCE_AMOUNT-self.FEE)):0.5f}
-    """)
-
+    """
+        )
 
     def get_rate(self):
         # get current rates for currency selected above
         try:
-            r, c =_api.connect_to_api("payload", _get=True, URL=BASE_URL, ENDPOINT=self._RATES)
+            r, c = self.connect_to_api(
+                "payload", _get=True, URL=BASE_URL, ENDPOINT=self._RATES
+            )
             rate = c[0]["rate"]
         except TypeError:
-            rate = False        
+            rate = False
         return rate
 
     def get_quote(self):
@@ -65,8 +73,9 @@ class TransferWise:
         }
         # Add Target or source amounts depending on above
         quote_payload.update(self.s if self.SOURCE_AMOUNT else self.t)
+
         # request the quote
-        quote_res, quote = _api.connect_to_api(
+        quote_res, quote = self.connect_to_api(
             quote_payload, _post=True, URL=BASE_URL, ENDPOINT=QUOTE
         )
         log.debug(f"Quote  ::  {quote_res}")
@@ -74,17 +83,17 @@ class TransferWise:
 
     def create_transfer(self, quote):
         transfer = {
-                    "targetAccount": TARGET_ACCOUNT,
-                    "quote": quote["id"],
-                    "customerTransactionId": str(uuid.uuid1()),
-                    "details": {
-                        "reference": self.REFERENCE,
-                        "transferPurpose": "verification.transfers.purpose.pay.bills",
-                        "sourceOfFunds": "verification.source.of.funds.other",
-                    },
-                }
+            "targetAccount": TARGET_ACCOUNT,
+            "quote": quote["id"],
+            "customerTransactionId": str(uuid.uuid1()),
+            "details": {
+                "reference": self.REFERENCE,
+                "transferPurpose": "verification.transfers.purpose.pay.bills",
+                "sourceOfFunds": "verification.source.of.funds.other",
+            },
+        }
         # add transfer
-        transfer_res, transfer_json = _api.connect_to_api(
+        transfer_res, transfer_json = self.connect_to_api(
             transfer, _post=True, URL=BASE_URL, ENDPOINT=TRANSFERS
         )
 
@@ -94,10 +103,13 @@ class TransferWise:
         return transfer_res, transfer_json
 
     def cancel_order(self, transfer_json):
-        cancel_res, cancel = _api.connect_to_api(
-                            "payload", _put=True, URL=BASE_URL, ENDPOINT=CANCEL_TRANSFER.format(self.HIGHEST_TRANSFER_ID)
-                        )
-        log.info(
+        cancel_res, cancel = self.connect_to_api(
+            "payload",
+            _put=True,
+            URL=BASE_URL,
+            ENDPOINT=CANCEL_TRANSFER.format(self.HIGHEST_TRANSFER_ID),
+        )
+        log.debug(
             f"Cancel Status Code  ::  {cancel_res}  ::   Cancel  Result  ::  {cancel}"
         )
 
@@ -115,16 +127,15 @@ class TransferWise:
                 f"\tProblem with Cancelling a TRANSFER:\tresponse code  ::  {cancel_res}\tMessage  ::  {cancel}"
             )
 
-
     def long_polling(self):
-        while True:    
+        while True:
             rate = self.get_rate()
             # Check if current rate is more than the starting exchange rate.
-            if rate and (rate> self.HIGHEST_RATE):
-                self.display_rate_info(rate)        
+            if rate and (rate > self.HIGHEST_RATE):
+                self.display_rate_info(rate)
                 # Step 1: Create a quote
                 quote_res, quote = self.get_quote()
-                
+
                 if quote_res == 200:
                     # Step 3: Create a transfer
                     transfer_res, transfer_json = self.create_transfer(quote)
@@ -138,7 +149,7 @@ class TransferWise:
                             self.cancel_order(transfer_json)
 
                         else:
-                            #set new HIGHEST_TRANSFER_ID.
+                            # set new HIGHEST_TRANSFER_ID.
                             self.HIGHEST_TRANSFER_ID = transfer_json["id"]
                             log.info(
                                 f"\t**FIRST** self.HIGHEST_TRANSFER_ID  ::  {self.HIGHEST_TRANSFER_ID}"
@@ -154,8 +165,9 @@ class TransferWise:
 
             time.sleep(self.DELAY)
 
+
 if __name__ == "__main__":
-    _api = TransferWiseApi(TOKEN, HEADER)
+    # self = TransferWiseApi(TOKEN, HEADER)
     tw = TransferWise(**data)
     tw.display_start_message()
     tw.long_polling()
