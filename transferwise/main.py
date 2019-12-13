@@ -164,7 +164,6 @@ class TransferWise(TransferWiseApi):
 
 
 if __name__ == "__main__":
-    # self = TransferWiseApi(TOKEN, HEADER)
     tw = TransferWise(**data)
     tw.display_start_message()
     tw.long_polling()
