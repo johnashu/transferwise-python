@@ -1,5 +1,4 @@
-import time
-from requests import get, post, put, Session, options, packages
+from requests import Session
 import logging as log
 from config import TOKEN, HEADER
 
@@ -29,7 +28,7 @@ class TransferWiseApi:
 
                 if _post:
                     try:
-                        response = post(
+                        response = session.post(
                             f"{URL}{ENDPOINT}", headers=self.HEADER, json=payload
                         )
                         if response.status_code in [200, 201, 409, 404]:
