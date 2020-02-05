@@ -1,6 +1,7 @@
 # transferwise-python
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/johnashu/transferwise-python.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/johnashu/transferwise-python/alerts/)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/johnashu/transferwise-python.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/johnashu/transferwise-python/alerts/)
+
 API connections for TransferWise.com
 
 Automatically saves a quote for 24hours of the highest rate.
