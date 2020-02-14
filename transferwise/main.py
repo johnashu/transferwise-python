@@ -13,6 +13,7 @@ lines = "-" * 200
 
 
 class TransferWise(TransferWiseApi):
+    
     def __init__(self, **kw):
         for k, v in kw.items():
             exec(f'self.{k} = kw["{k}"]')
