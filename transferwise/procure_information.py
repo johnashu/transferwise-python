@@ -13,7 +13,7 @@ def pprint_res(lst):
         print()
 
 
-tw = TransferWiseApi(TOKEN)
+tw = TransferWiseApi()
 
 code, profile = tw.connect_to_api(None, _get=True, URL=BASE_URL, ENDPOINT=PROFILE)
 

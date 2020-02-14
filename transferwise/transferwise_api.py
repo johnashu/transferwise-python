@@ -5,8 +5,6 @@ from config import TOKEN, HEADER
 
 class TransferWiseApi:
     """ Class that determines the API Actions """
-
-    TOKEN = TOKEN
     HEADER = HEADER
 
     def connect_to_api(

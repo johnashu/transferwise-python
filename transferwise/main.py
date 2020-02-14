@@ -1,5 +1,5 @@
 # Routine to find the best rates.. A new transfer wil be created and the old one deleted.
-
+import sys
 import uuid
 import time
 from transferwise_api import TransferWiseApi
@@ -125,41 +125,44 @@ class TransferWise(TransferWiseApi):
 
     def long_polling(self):
         while True:
-            rate = self.get_rate()
-            # Check if current rate is more than the starting exchange rate.
-            if rate and (rate > self.HIGHEST_RATE):
-                self.display_rate_info(rate)
-                # Step 1: Create a quote
-                quote_res, quote = self.get_quote()
+            try:
+                rate = self.get_rate()
+                # Check if current rate is more than the starting exchange rate.
+                # log.info(rate)
+                if rate and (rate > self.HIGHEST_RATE):
+                    self.display_rate_info(rate)
+                    # Step 1: Create a quote
+                    quote_res, quote = self.get_quote()
+                    if quote_res == 200:
+                        # Step 3: Create a transfer
+                        transfer_res, transfer_json = self.create_transfer(quote)
 
-                if quote_res == 200:
-                    # Step 3: Create a transfer
-                    transfer_res, transfer_json = self.create_transfer(quote)
+                        if transfer_res == 200:
+                            # Change highest rate to rate
+                            self.HIGHEST_RATE = rate
 
-                    if transfer_res == 200:
-                        # Change highest rate to rate
-                        self.HIGHEST_RATE = rate
+                            # Cancel old transfer
+                            if self.HIGHEST_TRANSFER_ID:
+                                self.cancel_order(transfer_json)
 
-                        # Cancel old transfer
-                        if self.HIGHEST_TRANSFER_ID:
-                            self.cancel_order(transfer_json)
-
+                            else:
+                                # set new HIGHEST_TRANSFER_ID.
+                                self.HIGHEST_TRANSFER_ID = transfer_json["id"]
+                                log.info(
+                                    f"\t**FIRST** self.HIGHEST_TRANSFER_ID  ::  {self.HIGHEST_TRANSFER_ID}"
+                                )
                         else:
-                            # set new HIGHEST_TRANSFER_ID.
-                            self.HIGHEST_TRANSFER_ID = transfer_json["id"]
-                            log.info(
-                                f"\t**FIRST** self.HIGHEST_TRANSFER_ID  ::  {self.HIGHEST_TRANSFER_ID}"
+                            log.error(
+                                f"\tProblem with creating a TRANSFER:\tresponse code  ::  {transfer_res}\tMessage  ::  {transfer_json}"
                             )
                     else:
                         log.error(
-                            f"\tProblem with creating a TRANSFER:\tresponse code  ::  {transfer_res}\tMessage  ::  {transfer_json}"
+                            f"\tProblem with creating a QUOTE:\tresponse code  ::  {quote_res}\tMessage  ::  {quote}"
                         )
-                else:
-                    log.error(
-                        f"\tProblem with creating a QUOTE:\tresponse code  ::  {quote_res}\tMessage  ::  {quote}"
-                    )
 
-            time.sleep(self.DELAY)
+                time.sleep(self.DELAY)
+            except KeyboardInterrupt:
+                sys.exit(1)
 
 
 if __name__ == "__main__":
